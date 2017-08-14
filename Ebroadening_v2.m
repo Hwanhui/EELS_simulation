@@ -43,7 +43,7 @@ function varargout = Ebroadening_v2(varargin)
 
 % Edit the above text to modify the response to help Ebroadening_v2
 
-% Last Modified by GUIDE v2.5 12-Aug-2017 11:38:51
+% Last Modified by GUIDE v2.5 14-Aug-2017 12:12:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -239,6 +239,15 @@ set(Ebroadening_v2, 'HandleVisibility', 'on');
 
 z=get(handles.zvalue,'String');z=str2num(cell2mat(z));
 raw=get(handles.excel, 'String'); raw=char(raw);
+
+if exist(raw, 'file') ==2
+else
+        uiwait(msgbox('The input file does not exist in this folder. Please check the file name', 'Error','error'));
+        return;
+end
+    
+
+
 Sim_00=xlsread(sprintf('%s',raw)); Sim_01=Sim_00(:,2); N=size(Sim_00); N=N(1);E=Sim_00(:,1);dispE=E(2)-E(1);
 
 contents=get(handles.shell,'String');
@@ -255,6 +264,12 @@ L=[0.014256302 0.025915531 0.042880693 0.061161003 0.081734468 0.108400029 0.136
 
 
 K_E=K_E';K=K';L_E=L_E';L=L';
+
+if z<=0
+    uiwait(msgbox('Z value must be positive','Error', 'error'));
+    return;
+end
+
 El=char(Elem(z));
 if shellv==1
     Sh='K';
@@ -271,10 +286,11 @@ for i=5*N+1:6*N
 end
 
 
+
 %Instrumental Energy Broadening
 if E_res==0
 else if E_res<0
-        warn=msgbox('Instrumental Energy broadening was not applied. Instrumental resolution must be positive')
+        warn=msgbox('Instrumental Energy broadening was not applied. Instrumental resolution must be positive','Warning','warn');
         waitfor (warn);
     else
     for i=1:N
@@ -307,7 +323,7 @@ else
         delE_i=0.000000000000000001;  
       warn=msgbox({sprintf('%s %s-edge does not exist.',El,Sh)},'Warning', 'warn');
        waitfor(warn);return;
-        elseif z>35
+        elseif z>35 && z<1
         delE_i=0.000000000000000001;  
          warn=msgbox({'Initial state E broadening value for';sprintf('%s %s-edge is not included in this code.',El,Sh);'Only final state E broadening will be applied.'},'Warning', 'warn');
          waitfor(warn);
@@ -404,6 +420,14 @@ set(Ebroadening_v2, 'HandleVisibility', 'on');
 
 z=get(handles.zvalue,'String');z=str2num(cell2mat(z));
 raw=get(handles.excel, 'String'); raw=char(raw);
+
+if exist(raw, 'file') ==2
+else
+        uiwait(msgbox('The input file does not exist in this folder. Please check the file name', 'Error','error'));
+        return;
+end
+    
+    
 Sim_00=xlsread(sprintf('%s',raw)); Sim_01=Sim_00(:,2); N=size(Sim_00); N=N(1);E=Sim_00(:,1);dispE=E(2)-E(1);
 
 contents=get(handles.shell,'String');
@@ -418,6 +442,11 @@ K=[0.003472895 0.005437027 0.014159278 0.029037153 0.030904672 0.076058456 0.108
 L_E=[73.1 99.2 132.2 164.8 200 245.2 293.6 346.4 402.2 455.5 513 574 640 708 779 854 931 1020 1115 1217 1323 1436 1550];
 L=[0.014256302 0.025915531 0.042880693 0.061161003 0.081734468 0.108400029 0.136390791 0.165796845 0.195731783 0.223850697 0.254674231 0.28920673 0.330109778 0.377224225 0.432247558 0.496219266 0.566223907 0.648676965 0.733030077 0.814770605 0.892746169 0.990534095 1.163994237];
 
+
+if z<0
+    uiwait(msgbox('Z value must be positive','Error', 'error'));
+    return;
+end
 
 K_E=K_E';K=K';L_E=L_E';L=L';
 El=char(Elem(z));
@@ -440,7 +469,7 @@ end
 %Instrumental Energy Broadening
 if E_res==0
 else if E_res<0
-        warn=msgbox('Instrumental Energy broadening was not applied. Instrumental resolution must be positive')
+        warn=msgbox('Instrumental Energy broadening was not applied. Instrumental resolution must be positive','Warning','warn');
         waitfor (warn);
     else
     for i=1:N
@@ -470,7 +499,7 @@ else
         delE_i=0.000000000000000001;  
       warn=msgbox({sprintf('%s %s-edge does not exist.',El,Sh)},'Warning', 'warn');
        waitfor(warn);return;
-        elseif z>35
+        elseif z>35 && z<1
         delE_i=0.000000000000000001;  
         uiwait(msgbox({'Initial state E broadening value for';sprintf('%s %s-edge is not included in this code.',El,Sh);'Only final state E broadening will be applied.'},'Warning', 'warn'));
         end   
@@ -639,3 +668,22 @@ fclose(fileID);
 fprintf(sprintf('\n\n Energy broadening on %s %s-edge was performed.', El, Sh)); fprintf('\n The result is exported as .txt and .csv files for Mac users \n');    
 end
 end
+
+
+% --- If Enable == 'on', executes on mouse press in 5 pixel border.
+% --- Otherwise, executes on mouse press in 5 pixel border or over runandexport.
+% function runandexport_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to runandexport (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on key press with focus on run and none of its controls.
+function run_KeyPressFcn(hObject, eventdata, handles)
+end
+% hObject    handle to run (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
